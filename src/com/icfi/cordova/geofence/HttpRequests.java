@@ -1,12 +1,16 @@
-package com.cowbell.cordova.geofence;
+package com.icfi.cordova.geofence;
 
 import android.util.Log;
+
+import com.cowbell.cordova.geofence.GeofencePlugin;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import static com.icfi.cordova.geofence.Constants.CIRCUIT_LOCATION_ENDPOINT;
 
 public class HttpRequests {
 
@@ -47,4 +51,15 @@ public class HttpRequests {
         }
     }
 
+    public static HttpRequest postGeofenceEvent(CircuitGeofenceEvent geofenceEvent, String deviceId) {
+        String endpoint = String.format(CIRCUIT_LOCATION_ENDPOINT, deviceId);
+        String jsonRequestBody = geofenceEvent.toJson();
+        Log.d(GeofencePlugin.TAG, "POSTing to " + endpoint + " with request body: " + jsonRequestBody);
+
+        return HttpRequest.post(endpoint)
+                .contentType(HttpRequest.CONTENT_TYPE_JSON)
+                .connectTimeout(8000)
+                .readTimeout(8000)
+                .send(jsonRequestBody);
+    }
 }

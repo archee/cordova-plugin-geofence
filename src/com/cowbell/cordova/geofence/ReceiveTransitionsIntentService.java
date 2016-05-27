@@ -1,12 +1,16 @@
 package com.cowbell.cordova.geofence;
 
 import android.app.IntentService;
+import android.content.Context;
 import android.content.Intent;
-import android.provider.Settings;
 import android.util.Log;
 
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.LocationClient;
+import com.icfi.cordova.geofence.CircuitGeofenceEvent;
+import com.icfi.cordova.geofence.FailedRequestsStorage;
+import com.icfi.cordova.geofence.HttpRequest;
+import com.icfi.cordova.geofence.HttpRequests;
 
 import java.io.IOException;
 import java.util.Date;
@@ -14,10 +18,9 @@ import java.util.List;
 
 public class ReceiveTransitionsIntentService extends IntentService {
 
-    private static final String circuitLocationEndpoint = "http://circuit-2015-services-p.elasticbeanstalk.com/devices/%s/locationEvents";
-
     protected GeoNotificationStore store;
-    private String deviceId;
+
+    private FailedRequestsStorage failedRequestsStorage;
 
     /**
      * Sets an identifier for the service
@@ -37,6 +40,7 @@ public class ReceiveTransitionsIntentService extends IntentService {
      */
     @Override
     protected void onHandleIntent(Intent intent) {
+        failedRequestsStorage = new FailedRequestsStorage(this);
         Logger logger = Logger.getLogger();
         logger.log(Log.DEBUG, "ReceiveTransitionsIntentService - onHandleIntent");
         // First check for errors
@@ -55,7 +59,7 @@ public class ReceiveTransitionsIntentService extends IntentService {
              * geofence or geofences that triggered the transition
              */
         } else {
-            String deviceId = intent.getStringExtra("com.cowbell.cordova.geofence.DEVICEID_EXTRA");
+            String deviceId = intent.getStringExtra("com.icfi.cordova.geofence.DEVICEID_EXTRA");
             Log.d(GeofencePlugin.TAG, "The device ID: " + deviceId);
 
             long now = new Date().getTime();
@@ -69,11 +73,13 @@ public class ReceiveTransitionsIntentService extends IntentService {
                         .getTriggeringGeofences(intent);
 
                 for (Geofence fence : triggerList) {
-                    CircuitLocationEvent locationEvent = new CircuitLocationEvent(fence.getRequestId(), transitionType, now);
+                    CircuitGeofenceEvent geofenceEvent = new CircuitGeofenceEvent(fence.getRequestId(), transitionType, now);
+
                     try {
-                        HttpRequests.postJson(String.format(circuitLocationEndpoint, deviceId), locationEvent.toJson());
-                    } catch (IOException e) {
+                        HttpRequests.postGeofenceEvent(geofenceEvent, deviceId);
+                    } catch (HttpRequest.HttpRequestException e) {
                         Log.e(GeofencePlugin.TAG, "IOException occurred while trying to POST to endpoint with message: " + e.getMessage());
+                        failedRequestsStorage.addFailedRequest(geofenceEvent);
                     }
                 }
             }

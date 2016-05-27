@@ -133,7 +133,7 @@ public class GeoNotificationManager {
                 ReceiveTransitionsIntentService.class);
 
         String deviceId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
-        intent.putExtra("com.cowbell.cordova.geofence.DEVICEID_EXTRA", deviceId);
+        intent.putExtra("com.icfi.cordova.geofence.DEVICEID_EXTRA", deviceId);
 
         /*
          * Return the PendingIntent

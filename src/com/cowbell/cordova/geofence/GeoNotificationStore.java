@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
+import android.util.Log;
 
 public class GeoNotificationStore {
     private LocalStorage storage;
 
     public GeoNotificationStore(Context context) {
+        Log.d(GeofencePlugin.TAG, context == null ? "Context in GeoNotificationStore is null..." : "Context in GeoNotificationStore is not null!?: " + context);
         storage = new LocalStorage(context);
     }
 

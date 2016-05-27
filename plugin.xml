@@ -46,8 +46,15 @@
         <source-file src="src/com/cowbell/cordova/geofence/ReceiveTransitionsIntentService.java" target-dir="src/com/cowbell/cordova/geofence" />
         <source-file src="src/com/cowbell/cordova/geofence/RemoveGeofenceCommand.java" target-dir="src/com/cowbell/cordova/geofence" />
 
-        <source-file src="src/com/cowbell/cordova/geofence/CircuitLocationEvent.java" target-dir="src/com/cowbell/cordova/geofence" />
-        <source-file src="src/com/cowbell/cordova/geofence/HttpRequests.java" target-dir="src/com/cowbell/cordova/geofence" />
+        <source-file src="src/com/icfi/cordova/geofence/CircuitGeofenceEvent.java" target-dir="src/com/icfi/cordova/geofence" />
+        <source-file src="src/com/icfi/cordova/geofence/HttpRequests.java" target-dir="src/com/icfi/cordova/geofence" />
+        <source-file src="src/com/icfi/cordova/geofence/HttpRequest.java" target-dir="src/com/icfi/cordova/geofence" />
+        <source-file src="src/com/icfi/cordova/geofence/Constants.java" target-dir="src/com/icfi/cordova/geofence" />
+        <source-file src="src/com/icfi/cordova/geofence/FailedRequest.java" target-dir="src/com/icfi/cordova/geofence" />
+        <source-file src="src/com/icfi/cordova/geofence/FailedRequestsDBHelper.java" target-dir="src/com/icfi/cordova/geofence" />
+        <source-file src="src/com/icfi/cordova/geofence/FailedRequestsStorage.java" target-dir="src/com/icfi/cordova/geofence" />
+        <source-file src="src/com/icfi/cordova/geofence/NetworkStateChangedReceiver.java" target-dir="src/com/icfi/cordova/geofence" />
+        <source-file src="src/com/icfi/cordova/geofence/RetryFailedRequestsService.java" target-dir="src/com/icfi/cordova/geofence" />
 
 
         <lib-file src="src/android/libs/gson-2.3.jar" />
@@ -64,17 +71,25 @@
             <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
             <uses-permission android:name="android.permission.VIBRATE" />
             <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+            <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+            <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
         </config-file>
 
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
             <service android:name="com.cowbell.cordova.geofence.ReceiveTransitionsIntentService" android:label="@string/app_name" android:exported="false">
             </service>
+            <service android:name="com.icfi.cordova.geofence.RetryFailedRequestsService" android:label="@string/app_name" android:exported="false"/>
         </config-file>
 
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
             <receiver android:name="com.cowbell.cordova.geofence.BootReceiver">
                 <intent-filter>
                     <action android:name="android.intent.action.BOOT_COMPLETED" />
+                </intent-filter>
+            </receiver>
+            <receiver android:name="com.icfi.cordova.geofence.NetworkStateChangedReceiver">
+                <intent-filter>
+                    <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
                 </intent-filter>
             </receiver>
 
